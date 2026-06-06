@@ -19,7 +19,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/buuild-push-action@v7
+        uses: docker/build-push-action@v7
         with:
           push: tru
           tags: esztike/github-actions-playground:latest
