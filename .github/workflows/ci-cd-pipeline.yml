@@ -1,0 +1,52 @@
+name: CI/CD pipeline
+
+# trigger
+on:
+  push:
+    branches:
+      - main
+
+# jobs
+jobs:
+  # job 1
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo code
+        # action 1
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        # action 2
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        run: npm ci # reads packages.json as is, and installs precisely those versions, and fails if don't match
+
+      - name: Run tests
+        run: npm test
+
+  # job 2
+  build-and-push:
+    needs: test # if test fails, job doesn't run
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo code
+        #action 1
+        uses: actions/checkout@v6
+
+      - name: Log in to Docker Hub
+        # action 2
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        # action 3
+        uses: docker/build-push-action@v7
+        with:
+          push: true
+          tags: esztike/github-actions-playground:latest
